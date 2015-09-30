@@ -18,6 +18,7 @@ namespace LoggingSample
             ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole();
+
             app.Run(async (context) =>
             {
                 var logger = loggerFactory.CreateLogger("LoggingSample.Startup");
@@ -28,7 +29,7 @@ namespace LoggingSample
         public void ConfigureLogMiddleware(IApplicationBuilder app,
             ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(minLevel: LogLevel.Information);
+            loggerFactory.AddConsole(minLevel: LogLevel.Debug);
             app.UseRequestLogger();
 
             app.Run(async context =>

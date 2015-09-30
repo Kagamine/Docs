@@ -10,7 +10,7 @@
     "web": {
       "commandName": "web",
       "environmentVariables": {
-        "ASPNET_ENV": "Development"
+        "ASPNET_ENV": "LogMiddleware"
       },
       "sdkVersion": "dnx-clr-win-x86.1.0.0-beta7"
     }

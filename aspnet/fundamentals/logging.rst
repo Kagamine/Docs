@@ -9,19 +9,19 @@ In this article:
 	- `Implementing Logging in your Application`_
 	- `Configuring Logging in your Application`_
 	
-`View or download sample from GitHub <https://github.com/aspnet/Home/tree/dev/samples>`_.
+`View or download sample from GitHub <https://github.com/aspnet/Docs/tree/1.0.0-beta7/aspnet/fundamentals/logging/sample>`_.
 
 Implementing Logging in your Application
 ----------------------------------------
 
-Adding logging to your application is done by requesting either an ``ILoggerFactory`` or an ``ILogger<T>`` via :doc:`dependency-injection`. If an ``ILoggerFactory`` is requested, a logger must be created using its ``CreateLogger`` method. The following example shows how to do this within the ``Configure`` method in the ``Startup`` class:
+Adding logging to a component in your application is done by requesting either an ``ILoggerFactory`` or an ``ILogger<T>`` via :doc:`dependency-injection`. If an ``ILoggerFactory`` is requested, a logger must be created using its ``CreateLogger`` method. The following example shows how to do this within the ``Configure`` method in the ``Startup`` class:
 
 .. literalinclude:: logging/sample/src/LoggingSample/Startup.cs
 	:language: c#
 	:linenos:
 	:lines: 17-27
 	:dedent: 8
-	:emphasize-lines: 2,7-8
+	:emphasize-lines: 2,8-9
 
 When a logger is created, a category name or source must be provided. By convention this string is hierarchical, with categories separated by dot (``.``) characters. Some logging providers have filtering support that leverages this convention, making it easier to locate logging output of interest. In the above example, the logging is configured to use the built-in `ConsoleLogger <https://github.com/aspnet/Logging/blob/1.0.0-beta6/src/Microsoft.Framework.Logging.Console/ConsoleLogger.cs>`_ (see `Configuring Logging in your Application`_ below). To see the console logger in action, run the sample application using the ``web`` command, and make a request to configured URL (``localhost:5000``). You should see output similar to the following:
 
@@ -57,10 +57,10 @@ Critical
 The ``Logging`` packages provides `helper extension methods <https://github.com/aspnet/Logging/blob/1.0.0-beta6/src/Microsoft.Framework.Logging.Abstractions/LoggerExtensions.cs>`_ for each of these standard ``LogLevel``s, allowing you to call ``LogInformation`` rather than the more verbose Log(LogLevel.Information, ...) method. Each of the ``LogLevel``-specific extension methods has several overloads, allowing you to pass in some or all of the following parameters:
 
 string data
-	The message to log. Called ``data`` because naming 
+	The message to log.
 
 int eventId
-	A numeric id to associate with the log, which can be used to associate a series of logged events with one another.
+	A numeric id to associate with the log, which can be used to associate a series of logged events with one another. Event IDs should be static and specific to a particular kind of event that is being logged. For instance, you might associate adding an item to a shopping cart as event id 1000 and completing a purchase as event id 1001. This allows intelligent filtering and processing of log statements.
 
 string format
 	A format string for the log message.
@@ -71,27 +71,27 @@ object[] args
 Exception error
 	An exception instance to log.
 
-.. note:: Some loggers, such as the built-in ``ConsoleLogger`` used in this article, will ignore the ``eventId`` parameter. If you need to display it, you can include it in the message string, as is done in the following sample.
+.. note:: Some loggers, such as the built-in ``ConsoleLogger`` used in this article, will ignore the ``eventId`` parameter. If you need to display it, you can include it in the message string. This is done in the following sample so you can easily see the eventId associated with each message, but in practice you would not typically include it in the log message.
 
 The following logging middleware adds logging before and after ASP.NET requests are handled, and logs any unhandled exceptions using the ``Critical`` log level. In the sample code, note that the critical logging is wrapped in a condition that first confirms that logging is enabled for the ``Critical`` ``LogLevel``. This is especially important if expensive operations are being done as part of the log process, or if the logging operation itself will be called many times (such as within a loop).
 
-Since a real ASP.NET application would be handling many concurrent requests, the logging utilizes a simple random number scheme for grouping by ``eventId``, making it simple to determine which log messages should be grouped together.
+In this example, event IDs have been defined for the beginning and end of requests, as well as exceptions.
 
 .. literalinclude:: logging/sample/src/LoggingSample/RequestLoggerMiddleware.cs
 	:language: c#
 	:linenos:
 	:lines: 10-48
 	:dedent: 4
-	:emphasize-lines: 17-19,26-33,35-36
+	:emphasize-lines: 6-8,19-21,28-34,37-38
 
 This middleware is configured in a separate method in ``Startup.cs`` (``ConfigureLogMiddleware``). You can run this example by setting the ``ASPNET_ENV`` variable to ``LogMiddleware``. Learn more about :doc:`environments`.
 
 .. literalinclude:: logging/sample/src/LoggingSample/Startup.cs
 	:language: c#
 	:linenos:
-	:lines: 27-42
+	:lines: 29-44
 	:dedent: 8
-	:emphasize-lines: 6, 10-13
+	:emphasize-lines: 5, 9-12
 
 This configuration will write "Hello, World!" to the response unless the request contains the string "boom", in which case it will throw an exception. When running the sample using this configuration and navigating to the path ``http://localhost:5000/boom`` the following output is sent to the console (note that ``Critical`` messages are formatted in red):
 
@@ -109,7 +109,7 @@ Scopes are not required, and should be used sparingly, if at all. They're best u
 Working with ILogger<T>
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-In addition to working with ``ILoggerFactory``, your application can request an instance of ``ILogger<T>`` as a dependency in a class's constructor, where T represents your class's name. For example, an ASP.NET Controller called ``HomeController`` that needed to perform logging could include an ``ILogger<HomeController>`` parameter in its constructor. When this technique is used, the logger will automatically use the type's name as its category name.
+In addition to working with ``ILoggerFactory``, your application can request an instance of ``ILogger<T>`` as a dependency in a class's constructor, where ``T`` is the type performing logging. For example, an ASP.NET Controller called ``HomeController`` that needed to perform logging could include an ``ILogger<HomeController>`` parameter in its constructor. When this technique is used, the logger will automatically use the type's name as its category name.
 
 You can see a simple example of this in action using middleware. The following middleware class requests an instance of ``ILogger<SimpleLoggerMiddleware>``. When it is created, an ``ILogger`` is provided with a category name already set to ``LoggingSample.SimpleLoggerMiddleware``.
 
@@ -191,7 +191,7 @@ The following are some recommendations you may find helpful when implementing lo
 
 5. Name your loggers with a distinct prefix so they can easily be filtered or disabled. Remember the ``Create<T>`` extension will create loggers named with the full name of the class.
 
-6. Use Scopes sparingly, and only for actions with a bounded start and end. For example, an MVC action. Avoid nesting many scopes within one another.
+6. Use Scopes sparingly, and only for actions with a bounded start and end. For example, the framework provides a scope around MVC actions. Avoid nesting many scopes within one another.
 
 7. Application logging code should be related to the business concerns of the application. Increase the logging verbosity to reveal additional framework-related concerns, rather than implementing yourself.
 

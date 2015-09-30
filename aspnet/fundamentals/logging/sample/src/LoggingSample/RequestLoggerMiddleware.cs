@@ -12,6 +12,9 @@ namespace LoggingSample
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
         private readonly static Random _random = new Random();
+        private const int BEGINREQUEST_EVENTID = 10001;
+        private const int ENDREQUEST_EVENTID = 10002;
+        private const int REQUESTEXCEPTION_EVENTID = 11001;
 
         public RequestLoggerMiddleware(RequestDelegate next, 
             ILoggerFactory loggerFactory)
@@ -22,10 +25,9 @@ namespace LoggingSample
 
         public async Task Invoke(HttpContext context)
         {
-            var eventId = _random.Next();
-            _logger.LogInformation(eventId, 
-                "{eventId}: Handling request: {path}", 
-                eventId, context.Request.Path);
+            _logger.LogInformation(BEGINREQUEST_EVENTID, 
+                "{eventId}: Handling request: {path}",
+                BEGINREQUEST_EVENTID, context.Request.Path);
             try
             {
                 await _next.Invoke(context);
@@ -36,13 +38,13 @@ namespace LoggingSample
                 {
                     // perform expensive operation related to logging
 
-                    var values = new FormattedLogValues("{eventId}: Unexpected error handling request {path}:",
-                        eventId, context.Request.Path);
-                    _logger.LogCritical(eventId, values, ex);
+                    var message =
+                        $"{REQUESTEXCEPTION_EVENTID}: Unexpected error handling request {context.Request.Path}:";
+                    _logger.LogCritical(REQUESTEXCEPTION_EVENTID, message, ex);
                 }
             }
-            _logger.LogInformation(eventId, 
-                "{eventId}: Finished handling request.", eventId);
+            _logger.LogInformation(ENDREQUEST_EVENTID, 
+                "{eventId}: Finished handling request.", ENDREQUEST_EVENTID);
         }
     }
 }
