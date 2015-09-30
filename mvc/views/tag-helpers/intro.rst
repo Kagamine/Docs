@@ -242,7 +242,8 @@ Tag Helpers compared to Web Server Controls
 
 - Multiple Tag Helpers can act on the same element (see `Avoiding Tag Helper conflicts <http://mvc.readthedocs.org/en/latest/views/tag-helpers/authoring.html#avoiding-tag-helper-conflicts>`__ ) while you typically can't compose Web Server controls.
 
-- Tag Helpers can modify the tag and content of HTML elements, but they don't directly modify anything else on a page. Web Server controls can include CSS stylesheets and javascript libraries, and they can bring in other assets that might have side effects on your page.
+- Tag Helpers can modify the tag and content of HTML elements that they're scoped to, but don't directly modify anything else on a page. Web Server controls have a less specific scope and can perform actions that affect other parts of your page; enabling unintended side effects. 
+
 
 - Web Server controls use type converters to convert strings into objects. With Tag Helpers, you work natively in C#, so you don't need to do type conversion. 
 
