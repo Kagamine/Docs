@@ -17,6 +17,7 @@ By `Rick Anderson`_
 
 What are Tag Helpers?
 ------------------------------------
+
 Tag Helpers enable server-side code to participate in creating and rendering HTML elements in Razor files. For example, the built-in `ImageTagHelper <https://github.com/aspnet/Mvc/blob/dev/src/Microsoft.AspNet.Mvc.TagHelpers/ImageTagHelper.cs>`__ can append a version number to the image name. Whenever the image changes, the server generates a new unique version for the image, so clients are guaranteed to get the current image (instead of a stale cached image). There are many built-in Tag Helpers for common tasks - such as creating forms, links, loading assets and more - and even more available in public GitHub repositories and as NuGet packages.
 Tag Helpers are authored in C#, and they target HTML elements based on element name, attribute name, or parent tag. For example, the built-in `LabelTagHelper  <https://github.com/aspnet/Mvc/blob/dev/src/Microsoft.AspNet.Mvc.TagHelpers/LabelTagHelper.cs>`__ can target the HTML ``<label>`` element when the ``LabelTagHelper`` attributes are applied. 
 If you're familiar with `HTML Helpers <http://stephenwalther.com/archive/2009/03/03/chapter-6-understanding-html-helpers>`__, Tag Helpers reduce the explicit transitions between HTML and C# in Razor views. `Tag Helpers compared to HTML Helpers`_ explains the differences in more detail.
@@ -45,12 +46,12 @@ Generates the following HTML:
 
    <label for="Email">Email</label>
    
-The ``asp-for`` attribute is made available by the ``aspFor`` property in the ``LabelTagHelper``. See :doc:`authoring` for more information.
+The ``asp-for`` attribute is made available by the ``For`` property in the ``LabelTagHelper``. See :doc:`authoring` for more information.
 
 Managing Tag Helper scope
 -----------------------------
 
-Tag Helpers can use a combination of ``@addTagHelper``, ``@removeTagHelper``, the "!" opt-out character in the view hierarchy to control when Tag Helpers are available to a view.
+Tag Helpers scope is controlled by a combination of ``@addTagHelper``, ``@removeTagHelper``, and the "!" opt-out character.
 
 ``@addTagHelper`` makes Tag Helpers available
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -62,8 +63,8 @@ If you create a new ASP.NET 5 web app named *AuthoringTagHelpers* (with no authe
    :emphasize-lines: 2
    :lines: 1-2
 
-The ``@addTagHelper`` directive makes Tag Helpers available to the view. In this case, the view file is *Views/_ViewImports.cshtml*, which by default is included in all views, which means that the Tag Helpers will be available to all views. The code above uses the wildcard syntax ("*") to specify that all Tag Helpers in the specified assembly (*Microsoft.AspNet.Mvc.TagHelpers*) will be available. The first parameter after ``@addTagHelper`` specifies the Tag Helpers to load (we are using "\*" for all Tag Helpers), and the second parameter "Microsoft.AspNet.Mvc.TagHelpers" specifies the assembly containing the Tag Helpers. *Microsoft.AspNet.Mvc.TagHelpers* is the assembly for the built-in ASP.NET 5 Tag Helpers.
-
+The ``@addTagHelper`` directive makes Tag Helpers available to the view. In this case, the view file is *Views/_ViewImports.cshtml*, which by default is inherited by all view files in the *Views* folder and sub-directories; making Tag Helpers available. The code above uses the wildcard syntax ("*") to specify that all Tag Helpers in the specified assembly (*Microsoft.AspNet.Mvc.TagHelpers*) will be available to every view file in the *Views* directory or sub-directory. The first parameter after ``@addTagHelper`` specifies the Tag Helpers to load (we are using "\*" for all Tag Helpers), and the second parameter "Microsoft.AspNet.Mvc.TagHelpers" specifies the assembly containing the Tag Helpers. *Microsoft.AspNet.Mvc.TagHelpers* is the assembly for the built-in ASP.NET 5 Tag Helpers.
+   
 To expose all of the Tag Helpers in this project (which creates an assembly named *AuthoringTagHelpers*), you would use the following:
 
 .. literalinclude:: authoring/sample/AuthoringTagHelpers/src/AuthoringTagHelpers/Views/_ViewImportsCopy.cshtml
@@ -86,7 +87,7 @@ To add a Tag Helper to a view using an FQN, you first add the FQN (``AuthoringTa
 	@addTagHelper "AuthoringTagHelpers.TagHelpers.E*, AuthoringTagHelpers"
 	@addTagHelper "AuthoringTagHelpers.TagHelpers.Email*, AuthoringTagHelpers"
 
-As mentioned previously, adding the ``@addTagHelper`` directive to the *Views/_ViewImports.cshtml* file makes the Tag Helper available to all views. You can use the ``@addTagHelper`` directive in specific view files if you want to opt-in to exposing the Tag Helper to only those views.
+As mentioned previously, adding the ``@addTagHelper`` directive to the *Views/_ViewImports.cshtml* file makes the Tag Helper available to all view files in the *Views* directory and sub-directories. You can use the ``@addTagHelper`` directive in specific view files if you want to opt-in to exposing the Tag Helper to only those views.
 
 ``@removeTagHelper`` removes Tag Helpers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -149,7 +150,7 @@ As soon as a Tag Helper attribute is entered, the tag and attribute fonts change
 
 .. image:: intro/_static/labelaspfor.png
 
-You can enter the Visual Studio *CompleteWord* shortcut (Ctrl +spacebar is the `default <https://msdn.microsoft.com/en-us/library/da5kh0wa.aspx>`__) inside the double quotes (""), and you are now in C#, just like you would be in a C# class. IntelliSense displays all the methods and properties on the page model. In the image below, I'm editing the ``Register`` view, so the ``RegisterViewModel`` is available.
+You can enter the Visual Studio *CompleteWord* shortcut (Ctrl +spacebar is the `default <https://msdn.microsoft.com/en-us/library/da5kh0wa.aspx>`__) inside the double quotes (""), and you are now in C#, just like you would be in a C# class. IntelliSense displays all the methods and properties on the page model. The methods and properties are available because the property type is ``ModelExpression``. In the image below, I'm editing the ``Register`` view, so the ``RegisterViewModel`` is available.
 
 .. image:: intro/_static/intellemail.png
 
@@ -178,38 +179,31 @@ Is an anonymous object used to represent attributes. Because **class** is a rese
   
 Using the ``LabelTagHelper``, the same markup can be written as:
 
-.. code-block:: html
+.. image:: intro/_static/label2.png 
 
-	<label class="caption" asp-for="FirstName"></label>
-  
 With the Tag Helper version, as soon as you enter ``<l`` in the Visual Studio editor, IntelliSense displays matching elements:
 
 .. image:: intro/_static/label.png 
 
-
 IntelliSense helps you write the entire line. The ``LabelTagHelper`` also defaults to setting the content of the ``asp-for`` attribute value ("FirstName") to "First Name"; It converts camel-cased properties to a sentence composed of the property name with a space where each new upper-case letter occurs. In the following markup:
 
+.. image:: intro/_static/label2.png 
+
+generates:
+ 
  .. code-block:: html
 
-	<label class="caption" asp-for="FirstName"></label>
- 
- generates:
- 
- .. code-block:: html
- 
 	<label class="caption" for="FirstName">First Name</label>
 
 The  camel-cased to sentence-cased content is not used if you add content to the ``<label>``. For example:
 
- .. code-block:: html
+.. image:: intro/_static/1stName.png
 
-	<label class="caption" asp-for="FirstName">Name First</label>
- 
- generates:
- 
+generates:
+
  .. code-block:: html
  
-	<label class="caption" for="FirstName">Name First</label>
+  <label class="caption" for="FirstName">Name First</label>
 
 The following code image shows the Form portion of the *Views/Account/Register.cshtml* Razor view generated from the legacy ASP.NET 4.5.x MVC template included with Visual Studio 2015.
 
@@ -242,17 +236,17 @@ The Visual Studio editor helps you write **all** of the markup in the Tag Helper
 Tag Helpers compared to Web Server Controls
 -----------------------------------------------
 
-Tag Helpers don't own the element they're associated with; they simply participate in the rendering of the element and content. ASP.NET `Web Server controls <https://msdn.microsoft.com/en-us/library/7698y1f0.aspx>`__ are declared and invoked on a page.
+- Tag Helpers don't own the element they're associated with; they simply participate in the rendering of the element and content. ASP.NET `Web Server controls <https://msdn.microsoft.com/en-us/library/7698y1f0.aspx>`__ are declared and invoked on a page.
 
-`Web Server controls <https://msdn.microsoft.com/en-us/library/zsyt68f1.aspx>`__ have a non-trivial lifecycle that can make developing and debugging difficult. Web Server controls allow you to add functionality to the client Document Object Model (DOM) elements by using a client control. Tag Helpers have no DOM. Web Server controls include automatic browser detection and some have the ability to pass events from a nested control (such as a button in a table) to the container control.
+- `Web Server controls <https://msdn.microsoft.com/en-us/library/zsyt68f1.aspx>`__ have a non-trivial lifecycle that can make developing and debugging difficult. Web Server controls allow you to add functionality to the client Document Object Model (DOM) elements by using a client control. Tag Helpers have no DOM. Web Server controls include automatic browser detection and some have the ability to pass events from a nested control (such as a button in a table) to the container control.
 
-Multiple Tag Helpers can act on the same element (see `Avoiding Tag Helper conflicts <http://mvc.readthedocs.org/en/latest/views/tag-helpers/authoring.html#avoiding-tag-helper-conflicts>`__ ) while you typically can't compose Web Server controls.
+- Multiple Tag Helpers can act on the same element (see `Avoiding Tag Helper conflicts <http://mvc.readthedocs.org/en/latest/views/tag-helpers/authoring.html#avoiding-tag-helper-conflicts>`__ ) while you typically can't compose Web Server controls.
 
-Tag Helpers can modify the tag and content of HTML elements, but they don't directly modify anything else on a page. Web Server controls can include CSS stylesheets and javascript libraries, and they can bring in other assets that might have side effects on your page.
+- Tag Helpers can modify the tag and content of HTML elements, but they don't directly modify anything else on a page. Web Server controls can include CSS stylesheets and javascript libraries, and they can bring in other assets that might have side effects on your page.
 
-Web Server controls use type converters to convert strings into objects. With Tag Helpers, you work natively in C#, so you don't need to do type conversion. 
+- Web Server controls use type converters to convert strings into objects. With Tag Helpers, you work natively in C#, so you don't need to do type conversion. 
 
-Web Server controls use `System.ComponentModel <https://msdn.microsoft.com/en-us/library/system.componentmodel%28v=vs.110%29.aspx>`__ to implement the run-time and design-time behavior of components and controls. ``System.ComponentModel`` includes the base classes and interfaces for implementing attributes and type converters, binding to data sources, and licensing components. Contrast that to Tag Helpers, which typically derive from ``TagHelper``, and the ``TagHelper`` base class exposes only two methods, ``Process`` and ``ProcessAsync``.
+- Web Server controls use `System.ComponentModel <https://msdn.microsoft.com/en-us/library/system.componentmodel%28v=vs.110%29.aspx>`__ to implement the run-time and design-time behavior of components and controls. ``System.ComponentModel`` includes the base classes and interfaces for implementing attributes and type converters, binding to data sources, and licensing components. Contrast that to Tag Helpers, which typically derive from ``TagHelper``, and the ``TagHelper`` base class exposes only two methods, ``Process`` and ``ProcessAsync``.
 
 Customizing the Tag Helper element font
 ---------------------------------------------
@@ -266,7 +260,7 @@ You can customize the font and colorization from **Tools** > **Options** > **Env
 Tag Helper naming conventions
 ---------------------------------------
 
-We recommend, for Tag Helpers that target `existing HTML elements <http://www.w3.org/TR/html-markup/elements.html>`_, that you preface attribute names with a prefix that indicates the attribute is additive and run on the server. (We say additive because the server adds to the existing markup.) For example, the built-in Tag Helpers use the "asp-" prefix. The "asp-" prefix is not considered a reserved prefix, so developers can copy that convention. Some teams will prefer to use their own naming convention to distinguish their Tag Helpers.
+We recommend, for Tag Helpers that target `existing HTML elements <http://www.w3.org/TR/html-markup/elements.html>`_, that you preface additive attribute names with a prefix to indicate they are run on the server. (We say additive because the server adds to the existing markup.) For example, the built-in Tag Helpers use the "asp-" prefix. The "asp-" prefix is not considered a reserved prefix, so developers can copy that convention. Some teams will prefer to use their own naming convention to distinguish their Tag Helpers.
 
 If a Tag Helper targets a custom element, we recommend the attributes not be prefixed. Custom elements are processed only on the server, so you don’t need the prefix to denote server processing. A good example is the ``EnvironmentTagHelper``. The following markup comes from the *Views/Shared/_Layout.cshtml* file created by a new ASP.NET Web App.
 
