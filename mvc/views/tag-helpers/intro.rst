@@ -11,7 +11,6 @@ By `Rick Anderson`_
     - `IntelliSense support for Tag Helpers`_
     - `Tag Helpers compared to HTML Helpers`_ 
     - `Tag Helpers compared to Web Server Controls`_
-    - `Tag Helper naming conventions`_
     - `Customizing the Tag Helper element font`_
     - `Additional Resources`_
 
@@ -238,7 +237,11 @@ Tag Helpers compared to Web Server Controls
 
 - Tag Helpers don't own the element they're associated with; they simply participate in the rendering of the element and content. ASP.NET `Web Server controls <https://msdn.microsoft.com/en-us/library/7698y1f0.aspx>`__ are declared and invoked on a page.
 
-- `Web Server controls <https://msdn.microsoft.com/en-us/library/zsyt68f1.aspx>`__ have a non-trivial lifecycle that can make developing and debugging difficult. Web Server controls allow you to add functionality to the client Document Object Model (DOM) elements by using a client control. Tag Helpers have no DOM. Web Server controls include automatic browser detection and some have the ability to pass events from a nested control (such as a button in a table) to the container control.
+- `Web Server controls <https://msdn.microsoft.com/en-us/library/zsyt68f1.aspx>`__ have a non-trivial lifecycle that can make developing and debugging difficult. 
+
+- Web Server controls allow you to add functionality to the client Document Object Model (DOM) elements by using a client control. Tag Helpers have no DOM. 
+
+-Web Server controls include automatic browser detection and some have the ability to pass events from a nested control (such as a button in a table) to the container control.
 
 - Multiple Tag Helpers can act on the same element (see `Avoiding Tag Helper conflicts <http://mvc.readthedocs.org/en/latest/views/tag-helpers/authoring.html#avoiding-tag-helper-conflicts>`__ ) while you typically can't compose Web Server controls.
 
@@ -256,18 +259,7 @@ You can customize the font and colorization from **Tools** > **Options** > **Env
 
 .. image:: intro/_static/fontoptions.png
 
-.. TODO Move "Tag Helper naming conventions" to the authoring TH doc.
 
-Tag Helper naming conventions
----------------------------------------
-
-We recommend, for Tag Helpers that target `existing HTML elements <http://www.w3.org/TR/html-markup/elements.html>`_, that you preface additive attribute names with a prefix to indicate they are run on the server. (We say additive because the server adds to the existing markup.) For example, the built-in Tag Helpers use the "asp-" prefix. The "asp-" prefix is not considered a reserved prefix, so developers can copy that convention. Some teams will prefer to use their own naming convention to distinguish their Tag Helpers.
-
-If a Tag Helper targets a custom element, we recommend the attributes not be prefixed. Custom elements are processed only on the server, so you don’t need the prefix to denote server processing. A good example is the ``EnvironmentTagHelper``. The following markup comes from the *Views/Shared/_Layout.cshtml* file created by a new ASP.NET Web App.
-
-.. code-block:: c#
-
-   <environment names="Development">
    
 Additional Resources
 ----------------------
