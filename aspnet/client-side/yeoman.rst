@@ -52,13 +52,13 @@ This walk-through demonstrates how to use Yeoman to generate an ASP.NET 5 web ap
 
 .. code-block:: console
 
- mkdir c:\MyYo
+ mkdir ~/MyYo
 
 4. On the command line, make the new directory the current directory.
 
 .. code-block:: console
  
- cd c:\MyYo
+ cd ~/MyYo
 
 5. Run the ``yo`` command and pass the name of the generator.
 
@@ -120,7 +120,7 @@ You can prepare and host your web application using commands **dnu** (Microsoft 
 
 .. code-block:: console
 
- cd c:\MyYo\MyWebApp 
+ cd ~/MyYo/MyWebApp 
  
 2. From the command line, restore the project's package dependencies.   
 
